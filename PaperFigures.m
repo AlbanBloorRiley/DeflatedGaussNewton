@@ -109,7 +109,7 @@ Opt = struct('NDeflations',42,'Method','Good_GN','epsilon',0.01);
 [GoodIterations,options] = DMin(obj_fun,x0,Opt);
 % Opt = struct('NDeflations',42,'Method','Bad_GN');
 % [BadIterations] = DMin(obj_fun,x0,Opt);
-Opt = struct('NDeflations',143,'Method','Newton','Regularisation',1e-4,'epsilon',0.1);
+Opt = struct('NDeflations',143,'Method','Newton','Regularisation',1e-4,'epsilon',0.01);
 [NewtonIterations] = DMin(obj_fun,x0,Opt);
 clf
 f = figure(1);
@@ -185,7 +185,7 @@ timesnoJ20 = times;
 
 
 
-%%
+%
 
 f = figure(1);
 clf
@@ -213,18 +213,19 @@ end
 
 subplot(1,2,2)
 temp = cumsum(timesnoJ);
-plot(temp(sort(IDnoJ)))
+plot(temp(sort(IDnoJ)),'linewidth',1)
 hold on
 temp = cumsum(timesJ);
-plot(temp(sort(IDJ)))
+plot(temp(sort(IDJ)),'linewidth',1)
 temp = cumsum(timesnoJ20);
-plot(temp(sort(IDnoJ20)))
+plot(temp(sort(IDnoJ20)),'linewidth',1)
 temp = cumsum(timesJ20);
-plot(temp(sort(IDJ20)))
+plot(temp(sort(IDJ20)),'linewidth',1)
 
-plot(cumsum([GoodIterations.Times]))
-plot(cumsum([BadIterations.Times]))
+plot(cumsum([GoodIterations.Times]),'linewidth',1)
+plot(cumsum([BadIterations.Times]),'linewidth',1)
 hold off
+setMarkerNumber(f.Children(1),10)
 xlabel('Minima')
 xlim([0,42])
 ylabel('Time in seconds')
