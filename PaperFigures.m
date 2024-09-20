@@ -65,10 +65,10 @@ ylabel('error')
 legend('location','eastoutside')
 
 f.Units = 'centimeters';
-% f.Position = [-50 10 20 14];
+f.Position = [-50 10 20 14];
 linestyleorder('default')
 %
-% print(f, 'sec2fig.eps', '-depsc')
+print(f, 'sec2fig.eps', '-depsc')
 
 
 %% Section 3.3 Figure
@@ -96,9 +96,9 @@ title("\epsilon = 0.4")
 xlabel('x_1')
 ylabel('x_2')
 legend('location',"southeast")
-% f.Units = 'centimeters';
-% f.Position = [-50 10 20 8];
-% print(f, 'sec3fig.eps', '-depsc')
+f.Units = 'centimeters';
+f.Position = [-50 10 20 8];
+print(f, 'sec3fig.eps', '-depsc')
 
 %% Section 4.2 figure
 clear all
@@ -130,8 +130,8 @@ title("Newton")
 xlabel('x_1')
 ylabel('x_2')
 f.Units = 'centimeters';
-% f.Position = [-50 10 20 8];
-% print(f, 'sec4Ftrigfig.eps', '-depsc')
+f.Position = [-50 10 20 8];
+print(f, 'sec4Ftrigfig.eps', '-depsc')
 %%
  clear all
  x0=[1;3];
@@ -183,10 +183,6 @@ ms = MultiStart('StartPointsToRun','bounds','Display','final', 'OutputFcn',{@tic
 [~,IDnoJ20] = uniquetol(localSolTableJ20.X,1e-3,'ByRows',true);
 timesnoJ20 = times;
 
-
-
-%
-
 f = figure(1);
 clf
 subplot(1,2,1)
@@ -232,8 +228,8 @@ ylabel('Time in seconds')
 
 
 f.Units = 'centimeters';
-% f.Position = [-50 20 30 9];
-% print(f, 'sec4MultiStartfig.eps', '-depsc')
+f.Position = [-50 20 30 9];
+print(f, 'sec4MultiStartfig.eps', '-depsc')
 
 
 %% Section 4.3.1 figure comparison
@@ -279,8 +275,8 @@ xlim([0,150])
 
 linestyleorder('default')
 f.Units = 'centimeters';
-% f.Position = [-50 10 20 13];
-% print(f, 'sec4FtrigfigCompare.eps', '-depsc')
+f.Position = [-50 10 20 13];
+print(f, 'sec4FtrigfigCompare.eps', '-depsc')
 
 %% Section 4.3.1 figure Bratu
 clear all
@@ -339,8 +335,8 @@ else
     setMarkerNumber(f.Children(3),21)
 end
 f.Units = 'centimeters';
-% f.Position = [-50 10 20 10];
-% print(f, 'sec4Bratufig.eps', '-depsc')
+f.Position = [-50 10 20 10];
+print(f, 'sec4Bratufig.eps', '-depsc')
 
 %% Section 4.3.2 Figure
 clear all
@@ -401,8 +397,8 @@ else
     setMarkerNumber(f.Children(3),21)
 end
 f.Units = 'centimeters';
-% f.Position = [-50 10 20 10];
-% print(f, 'sec4Carrierfig.eps', '-depsc')
+f.Position = [-50 10 20 10];
+print(f, 'sec4Carrierfig.eps', '-depsc')
 
 
 %% Section 4.3.2 comparison figure part 1
@@ -514,29 +510,46 @@ setMarkerNumber(f.Children(2),50)
 if options.ShowLegend;rearangelegend(BadBetterIterations,options,loc);end
 
 f.Units = 'centimeters';
-% f.Position = [0 0 20 18];
-% print(f, 'sec4CarrierfigCompareLines.eps', '-depsc')
+f.Position = [0 0 20 18];
+print(f, 'sec4CarrierfigCompareLines.eps', '-depsc')
 
 
 %%
-clear Sys Exp
-[Sys1,Exp] = Mn12_Spin_Sys_3(1,1);
-Sys = Sys1;
-Vary=Sys;
+clear all
+rcm = 29979.2458;    % reciprocal cm to MHz
+meV = rcm*8.065;  
+B20 = -0.0570*meV/3; %(D = 3*B02)
+B40 = (-2.78*10^-6)*meV;
+B44 = (-3.2*10^-6)*meV;
+B22 = (6.8*10^-4)*meV;
+x0 = round([B20;B40;B44;B22; -9.1192e+05],2,'significant');
+Sys.S = 10; 
+Sys.B2 = [B22 0 B20 0 0];        % B(k=2,q) with q = +2,+1,0,-1,-2
+Sys.B4 = [B44 0 0 0 B40 0 0 0 0];  % B(k=4,q) with q = +4,+3,+2,+1,0,-1,-2,-3,-4
+H = ham(Sys,[0,0,0]);  [~,E]=eig(H);
+EE = diag(E);  Exp.ev=EE-EE(1);
+
+% A{5} = speye(length(EE));
+%The Stevens Operators
+A{1} = stev(10,[2,0]);
+A{2} = stev(10,[4,0]);
+A{3} = stev(10,[4,4]);
+A{4} = stev(10,[2,2]);
+constants.A = A;
+constants.ev = EE;
 
 Opt = struct('NDeflations',4,'Method','Good_GN','Linesearch','Quadratic',...
-    'IEPType','Classic','Verbose',false,'scaled',false,'c1',1e-16);
-[SysOutGood]= INS_IEP(Sys,Vary,Exp,Opt);
-
-
-Opt = struct('NDeflations',4,'Method','Bad_GN','Linesearch','No',...
-    'IEPType','Classic','Verbose',false,'scaled',false,'c1',1e-9,'theta',2);
-[SysOutBad]= INS_IEP(Sys,Vary,Exp,Opt);
-
-
-Opt = struct('NDeflations',4,'Method','Newton','Linesearch','Armijo',...
-    'IEPType','Classic','Verbose',false,'scaled',false,'c1',1e-4);
-[SysOutNewton]= INS_IEP(Sys,Vary,Exp,Opt);
+'Verbose',false,'c1',1e-8,'constants',constants);
+obj_fun = @INSEvaulateDifference;
+[SysOutGood]= DMin(obj_fun,x0(1:end-1),Opt);
+%
+Opt = struct('NDeflations',5,'Method','Bad_GN','Linesearch','Quadratic',...
+    'Verbose',false,'c1',1e-9,'theta',2,'constants',constants);
+[SysOutBad]= DMin(obj_fun,x0(1:end-1),Opt);
+%
+Opt = struct('NDeflations',6,'Method','Newton','Linesearch','No',...
+    'Verbose',false,'scaled',false,'c1',1e-4,'constants',constants);
+[SysOutNewton]= DMin(obj_fun,x0(1:end-1),Opt);
 %%
 clf
 f=figure(1);
@@ -580,8 +593,8 @@ xlabel('k')
 ylabel('error')
 ylim([1e-10,1e5])
 f.Units = 'centimeters';
-% f.Position = [10 10 20 12];
-% print(f, 'sec4Mn12.eps', '-depsc')
+f.Position = [10 10 20 12];
+print(f, 'sec4Mn12.eps', '-depsc')
 
 %%
 
@@ -764,5 +777,89 @@ if nargin>4
     error("Too many outputs")
 end
 end
+
+
+
+
+function [F,R,J,H] = INSEvaulateDifference(x,constants)
+A = constants.A; 
+    Ad = x(1)*A{1};
+    for i = 2:length(x)
+        Ad = Ad + x(i)*A{i};
+    end
+    [Q,D] = eig(full(Ad),'vector');
+    D = D(1:length(constants.ev));
+    Q = Q(:,1:length(constants.ev));
+    R = ((D(2:end) - D(1:end-1)) - (constants.ev(2:end) - constants.ev(1:end-1)));
+    F = sqrt(sum((R).^2));
+    if nargout>2
+        l = length(A);
+        m = size(Q,2);
+        LJ = zeros(m,l);
+        for k = 1:l
+            LJ(:,k) =real(sum((Q.'*A{k}).*Q',2)); 
+        end
+        J = LJ(2:end,:) - LJ(1:end-1,:);
+    end
+    if nargout>3
+        m = length(constants.ev); l=length(A);
+        LH = zeros(l,l,m);
+        QAQ = cell(1,l);
+        for i = 1:l
+            QAQ{i} = Q'*A{i}*Q;
+            QAQ{i} =QAQ{i}(1:m,1:m);
+        end
+        DD=D'-D;
+        DD(abs(DD)<1e-15) = Inf;
+        for j=1:l
+            for k = 1:l
+                LH(k,j,:) = real(2*sum(QAQ{k}.*QAQ{j}./DD));
+            end
+        end
+        H = LH(:,:,2:end) - LH(:,:,1:end-1);
+    end
+    
+end
+
+
+
+% function [F,R,J,H] = INSEvaulate(x,constants)
+% A = constants.A; 
+%     Ad = x(1)*A{1};
+%     for i = 2:length(x)
+%         Ad = Ad + x(i)*A{i};
+%     end
+%     [Q,D] = eig(full(Ad),'vector');
+%     D = D(1:length(constants.ev));
+%     Q = Q(:,1:length(constants.ev));
+%     F = sqrt(sum((D-constants.ev).^2));
+%     if nargout>1
+%         R = (D-constants.ev);
+%     end
+%     if nargout>2
+%         l = length(A);
+%         m = size(Q,2);
+%         J = zeros(m,l);
+%         for k = 1:l
+%             J(:,k) =real(sum((Q.'*A{k}).*Q',2)); 
+%         end
+%     end
+%     if nargout>3
+%         m = length(constants.ev); l=length(A);
+%         H = zeros(l,l,m);
+%         QAQ = cell(1,l);
+%         for i = 1:l
+%             QAQ{i} = Q'*A{i}*Q;
+%             QAQ{i} =QAQ{i}(1:m,1:m);
+%         end
+%         DD=D'-D;
+%         DD(abs(DD)<1e-15) = Inf;
+%         for j=1:l
+%             for k = 1:l
+%                 H(k,j,:) = real(2*sum(QAQ{k}.*QAQ{j}./DD));
+%             end
+%         end
+%     end
+% end
 
 
