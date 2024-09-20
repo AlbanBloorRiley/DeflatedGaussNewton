@@ -56,9 +56,9 @@ set(h3,'FaceColor',colours(3,:)); plot(nan, nan,'o','MarkerFaceColor',colours(3,
 
 if options.ShowLegend
     if options.epsilon ==0
-        legend("1<\beta","0<\beta<1","\beta<0",'fontsize',options.FontSize);
+        legend("\beta<0","0<\beta<1","1<\beta",'fontsize',options.FontSize);
     else
-        legend("1-\epsilon<\beta","0<\beta<1-\epsilon","\beta<0",'fontsize',options.FontSize);
+        legend("\beta<0","0<\beta<1-\epsilon","1-\epsilon<\beta",'fontsize',options.FontSize);
     end
 end
 
