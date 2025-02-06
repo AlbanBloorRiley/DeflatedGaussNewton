@@ -46,8 +46,6 @@ subplot(2,2,4)
 options.ShowDeflations=[];options.xylim = 1e-20;
 options.ShowLegend = true;options.FontSize = 8;
 options.ShowDeflations = [];
-Iterationss = Iterations(1);
-Iterationss.ConvergenceFlag = "";
 PlotBetaContours(Iterations,options,obj_fun)
 axis off
 xlim([100,101])
@@ -99,6 +97,65 @@ legend('location',"southeast")
 f.Units = 'centimeters';
 f.Position = [-50 10 20 8];
 print(f, 'sec3fig.eps', '-depsc')
+
+
+%% Section 3.3(?) figure comparing convergence rates with different epsilon
+
+clear all
+obj_fun = @Himmelblau;
+x0=[0;-1];
+method = 'Good_GN';
+Opt = struct('NDeflations',4,'Method',method,'epsilon',0);
+[Iterations0,options] = DMin(obj_fun,x0,Opt);
+Opt = struct('NDeflations',4,'Method',method,'epsilon',0.01);
+[Iterations01,options] = DMin(obj_fun,x0,Opt);
+Opt = struct('NDeflations',4,'Method',method,'epsilon',0.1);
+[Iterations1,options] = DMin(obj_fun,x0,Opt);
+%
+f = figure(1);
+clf
+options.ShowDeflations = 1:4; options.ShowLegend = false;
+
+subplot(1,3,1)
+title('\epsilon = 0')
+PlotxConvergence(Iterations0,options)
+axis on
+xlim([0,30])
+ylim([1e-14,1e3])
+grid on
+xlabel('k')
+ylabel('error')
+% legend('location','eastoutside')
+
+subplot(1,3,2)
+options.ShowLegend = true;
+title('\epsilon = 0.01')
+PlotxConvergence(Iterations01,options)
+axis on
+xlim([0,30])
+ylim([1e-14,1e3])
+grid on
+xlabel('k')
+ylabel('error')
+legend('location','south')
+
+subplot(1,3,3)
+options.ShowLegend = false;
+title('\epsilon = 0.1')
+PlotxConvergence(Iterations1,options)
+axis on
+xlim([0,30])
+ylim([1e-14,1e3])
+grid on
+xlabel('k')
+ylabel('error')
+
+f.Units = 'centimeters';
+f.Position = [-50 10 20 14];
+linestyleorder('mixedstyles')
+%
+print(f, 'sec2figEpsilonComparison.eps', '-depsc')
+
 
 %% Section 4.2 figure
 clear all
