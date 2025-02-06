@@ -476,8 +476,6 @@ xlim([0,110])
 ylim([1e-15,1e10])
 setMarkerNumber(f.Children(2),50)
 if options.ShowLegend;rearangelegend(GoodIterations,options,loc);end
-ylim([1e-20,1e10])
-yticks([1e-30,1e-20,1e-10,1,1e10])
 
 subplot(4,1,2)
 
@@ -490,8 +488,7 @@ ylim([1e-15,1e10])
 setMarkerNumber(f.Children(2),50)
 if options.ShowLegend;rearangelegend(BadIterations,options,loc);end
 ylim([1e-20,1e10])
-yticks([1e-30,1e-20,1e-10,1,1e10])
-
+yticks([1e-20,1e-10,1,1e10])
 subplot(4,1,3)
 
 options.ShowDeflations = 1:length(BetterIterations); 
@@ -504,8 +501,7 @@ ylim([1e-15,1e10])
 setMarkerNumber(f.Children(2),50)
 if options.ShowLegend;rearangelegend(BetterIterations,options,loc);end
 ylim([1e-20,1e10])
-yticks([1e-30,1e-20,1e-10,1,1e10])
-
+yticks([1e-20,1e-10,1,1e10])
 subplot(4,1,4)
 
 options.ShowDeflations = 1:length(BadBetterIterations);
@@ -518,11 +514,10 @@ ylim([1e-15,1e10])
 setMarkerNumber(f.Children(2),50)
 if options.ShowLegend;rearangelegend(BadBetterIterations,options,loc);end
 ylim([1e-20,1e10])
-yticks([1e-30,1e-20,1e-10,1,1e10])
-
+yticks([1e-20,1e-10,1,1e10])
 
 f.Units = 'centimeters';
-f.Position = [-50 10 20 18];
+f.Position = [0 0 20 18];
 print(f, 'sec4CarrierfigCompareLines.eps', '-depsc')
 
 
