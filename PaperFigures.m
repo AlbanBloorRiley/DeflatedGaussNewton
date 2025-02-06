@@ -299,7 +299,7 @@ Opt = struct('NDeflations',42,'Method','Good_GN');
 [GoodIterations,options] = DMin(obj_fun,x0,Opt);
 Opt = struct('NDeflations',42,'Method','Bad_GN');
 [BadIterations] = DMin(obj_fun,x0,Opt);
-Opt = struct('NDeflations',143,'Method','Newton','Regularisation',1e-4,'epsilon',0.1);
+Opt = struct('NDeflations',143,'Method','Newton','Regularisation',1e-4,'epsilon',0.01);
 [NewtonIterations] = DMin(obj_fun,x0,Opt);
 %
 clf
@@ -419,7 +419,7 @@ x0 = zeros(2*n+1,1);
 Method = 'Good_GN';
 NDeflations = 5;
 
-Opt = struct('NDeflations',NDeflations,'Method',Method,'theta',2,...
+Opt = struct('NDeflations',NDeflations,'Method',Method,...
     'MaxIter',200,'NormWeighting',constants.A,'ObjectiveTolerance',1e-10,...
     'LinearSolver','lsqminnorm','Linesearch','Quadratic');
 [Iterations,options] = DMin(obj_fun,x0,Opt);
@@ -615,7 +615,7 @@ obj_fun = @INSEvaulateDifference;
 [SysOutGood]= DMin(obj_fun,x0(1:end-1),Opt);
 %
 Opt = struct('NDeflations',5,'Method','Bad_GN','Linesearch','Quadratic',...
-    'Verbose',false,'c1',1e-9,'theta',2,'constants',constants);
+    'Verbose',false,'c1',1e-9,'constants',constants);
 [SysOutBad]= DMin(obj_fun,x0(1:end-1),Opt);
 %
 Opt = struct('NDeflations',6,'Method','Newton','Linesearch','No',...
