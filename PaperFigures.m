@@ -14,6 +14,8 @@ options.xylim = 6;   options.NPoints = 100;
 options.constants = [];  options.ShowLegend = false; %options.FontSize = 8;
 options.plotlines = false; options.ShowDeflations = 1:length(Iterations)-1;
 
+% options.edgecolour = 'white';                 %Changes contour outlines
+
 subplot(2,2,1)
 options.ShowDeflations = 1:1; 
 options.plotlines = 2;

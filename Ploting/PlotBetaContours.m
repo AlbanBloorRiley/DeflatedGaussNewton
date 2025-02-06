@@ -47,12 +47,17 @@ green = [222, 245, 208];
 
 colours = [red;orange;green]./255;
 hold on;
-[~,h1] = contourf(X,Y,Beta,[-inf,-inf],'edgecolor','none','HandleVisibility','off');
-[~,h2] = contourf(X,Y,Beta,[0,0],'edgecolor','none','HandleVisibility','off');
-[~,h3] = contourf(X,Y,Beta,[1-options.epsilon,1-options.epsilon],'edgecolor','none','HandleVisibility','off');
-set(h1,'FaceColor',colours(1,:)); plot(nan, nan,'o','MarkerFaceColor',colours(1,:),'MarkerEdgeColor','none');
-set(h2,'FaceColor',colours(2,:)); plot(nan, nan,'o','MarkerFaceColor',colours(2,:),'MarkerEdgeColor','none');
-set(h3,'FaceColor',colours(3,:)); plot(nan, nan,'o','MarkerFaceColor',colours(3,:),'MarkerEdgeColor','none' );
+if isfield(options,'edgecolour')
+    edgecolour = options.edgecolour;
+else
+    edgecolour = "none";
+end
+[~,h1] = contourf(X,Y,Beta,[-inf,-inf],'edgecolor',edgecolour,'HandleVisibility','off');
+[~,h2] = contourf(X,Y,Beta,[0,0],'edgecolor',edgecolour,'HandleVisibility','off');
+[~,h3] = contourf(X,Y,Beta,[1-options.epsilon,1-options.epsilon],'edgecolor',edgecolour,'HandleVisibility','off');
+set(h1,'FaceColor',colours(1,:)); plot(nan, nan,'o','MarkerFaceColor',colours(1,:),'MarkerEdgeColor',edgecolour);
+set(h2,'FaceColor',colours(2,:)); plot(nan, nan,'o','MarkerFaceColor',colours(2,:),'MarkerEdgeColor',edgecolour);
+set(h3,'FaceColor',colours(3,:)); plot(nan, nan,'o','MarkerFaceColor',colours(3,:),'MarkerEdgeColor',edgecolour );
 
 if options.ShowLegend
     if options.epsilon ==0
