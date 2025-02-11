@@ -153,7 +153,7 @@ xlabel('k')
 ylabel('error')
 
 f.Units = 'centimeters';
-f.Position = [-50 10 20 14];
+f.Position = [-50 10 20 8];
 linestyleorder('mixedstyles')
 %
 print(f, 'sec2figEpsilonComparison.eps', '-depsc')
@@ -408,7 +408,7 @@ xi = linspace(0,t,m);
 constants.m = m;
 constants.xi = xi;
 constants.A = exp(1i*constants.xi'*(-n:n)*2*pi/T);
-constants.D2 = spdiags(-((-n:n)'*2*pi/T).^2,0,2*n+1,2*n+1);
+constants.D2 = spdiags(-((-n:n)'*2*pi/T).^2,0,2*n+ 1,2*n+1);
 constants.e0 = ones(1,2*n+1);
 constants.et = exp(1i*t*(-n:n)*2*pi/T);
 obj_fun=@(x,~)EvaluateCarrier(x,constants);
