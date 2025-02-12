@@ -158,6 +158,97 @@ linestyleorder('mixedstyles')
 %
 print(f, 'sec2figEpsilonComparison.eps', '-depsc')
 
+%% Figure to show deflated steps in convergence Good GN
+clear all
+method = 'Good_GN';
+obj_fun = @FTrig;
+x0=[1;3];
+
+options.ShowLegend = false;
+
+Opt = struct('NDeflations',10,'Method',method,'StepTolerance',1e-10,'epsilon',0.0);
+[Iterations0,options0] = DMin(obj_fun,x0,Opt);
+options0.ShowDeflations = 1:7; options0.ShowLegend = options.ShowLegend ;
+Opt = struct('NDeflations',10,'Method',method,'StepTolerance',1e-10,'epsilon',0.001);
+[Iterations01,options01] = DMin(obj_fun,x0,Opt);
+options01.ShowDeflations = 1:7; options01.ShowLegend = options.ShowLegend ;
+
+f = figure(1);
+clf
+
+subplot(1,2,1)
+title('\epsilon = 0')
+PlotDeflatedConvergence(Iterations0,obj_fun,options0)
+axis on
+% xlim([0,15])
+ylim([1e-14,1e3])
+grid on
+xlabel('k')
+ylabel('error')
+% legend('location','eastoutside')
+
+subplot(1,2,2)
+title('\epsilon = 0.001')
+PlotDeflatedConvergence(Iterations01,obj_fun,options01)
+axis on
+% xlim([0,15])
+ylim([1e-14,1e3])
+grid on
+xlabel('k')
+ylabel('error')
+% legend('location','south')
+
+f.Units = 'centimeters';
+f.Position = [-50 10 20 8];
+%
+print(f, 'figShowingDeflatedStepsGoodGN.eps', '-depsc')
+%% Figure to show deflated steps in convergence Bad GN
+clear all
+method = 'Bad_GN';
+obj_fun = @FTrig;
+x0=[1;3];
+
+options.ShowLegend = false;
+
+Opt = struct('NDeflations',10,'Method',method,'StepTolerance',1e-10,'epsilon',0.0);
+[Iterations0,options0] = DMin(obj_fun,x0,Opt);
+options0.ShowDeflations = 1:7; options0.ShowLegend = options.ShowLegend ;
+Opt = struct('NDeflations',10,'Method',method,'StepTolerance',1e-10,'epsilon',0.01);
+[Iterations01,options01] = DMin(obj_fun,x0,Opt);
+options01.ShowDeflations = 1:7; options01.ShowLegend = options.ShowLegend ;
+
+f = figure(1);
+clf
+
+subplot(1,2,1)
+title('\epsilon = 0')
+PlotDeflatedConvergence(Iterations0,obj_fun,options0)
+axis on
+xlim([0,25])
+ylim([1e-14,1e3])
+grid on
+xlabel('k')
+ylabel('error')
+% legend('location','eastoutside')
+
+subplot(1,2,2)
+title('\epsilon = 0.01')
+PlotDeflatedConvergence(Iterations01,obj_fun,options01)
+axis on
+% xlim([0,25])
+ylim([1e-14,1e3])
+grid on
+xlabel('k')
+ylabel('error')
+% legend('location','south')
+
+f.Units = 'centimeters';
+f.Position = [-50 10 20 8];
+%
+print(f, 'figShowingDeflatedStepsBadGN.eps', '-depsc')
+
+
+
 
 %% Section 4.2 figure
 clear all
