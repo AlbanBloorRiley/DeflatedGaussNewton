@@ -50,7 +50,7 @@ while stop == false
     end
 
     % Calculate effect on log(Mu) in p direction
-    pTgradNu = dot(X.gradMu,p)/X.Mu;
+    pTgradNu = real(dot(X.gradMu,p)/X.Mu);
 
     if (pTgradNu <= params.deflation.epsilon) || (abs(pTgradNu - 1)<1e-8) % Zone 1 (or deflation blowup)
         % Perform a line search on the undeflated problem
@@ -58,9 +58,9 @@ while stop == false
         FuncCount = FuncCount+FCount;
         if alpha <= params.linesearch.merit.minalpha
             if rank(X.J) < length(x)
-                CurrentLoop.ConvergenceFlag = "Merit line search terminated with rank deficient Jacobian";
+                CurrentLoop.ConvergenceFlag = 'Merit line search terminated with rank deficient Jacobian';
             else
-                CurrentLoop.ConvergenceFlag = "Merit line search terminated";
+                CurrentLoop.ConvergenceFlag = 'Merit line search terminated';
             end
             break
         end
