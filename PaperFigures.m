@@ -489,8 +489,9 @@ f.Units = 'centimeters';
 f.Position = [-50 10 20 10];
 print(f, 'sec4Bratufig.eps', '-depsc')
 
-%% Section 4.3.2 Figure
+%% Section Carrier Equation
 clear all
+rng(1)
 n = 100;    
 m = 4*n;
 t = 1;
@@ -502,27 +503,34 @@ constants.A = exp(1i*constants.xi'*(-n:n)*2*pi/T);
 constants.D2 = spdiags(-((-n:n)'*2*pi/T).^2,0,2*n+ 1,2*n+1);
 constants.e0 = ones(1,2*n+1);
 constants.et = exp(1i*t*(-n:n)*2*pi/T);
+constants.et = (-1).^(-n:n);
+
+constants.epsilon =  (0.2)       %Carrier equation constant
+constants.epsilon =  sqrt(0.2)
+
 obj_fun=@(x,~)EvaluateCarrier(x,constants);
 evalfun = @(c,x) exp(1i*x*(-n:n)*2*pi/T)*c;
 
 x0 = zeros(2*n+1,1); 
-
+% x0 = ones(2*n+1,1).*1e-8; 
+% x0 = rand(2*n+1,1)*1e-8;
 Method = 'Good_GN';
-NDeflations = 5;
+NDeflations = 10;
 
-Opt = struct('NDeflations',NDeflations,'Method',Method,...
-    'MaxIter',200,'NormWeighting',constants.A,'ObjectiveTolerance',1e-10,...
-    'LinearSolver','lsqminnorm','Linesearch','Quadratic');
+Opt = struct('NDeflations',NDeflations,'Method',Method,'epsilon',0.4,...
+    'MaxIter',400,'NormWeighting',constants.A,'ObjectiveTolerance',1e-18,...
+    'StepTolerance',1e-4,'LinearSolver','lsqminnorm','Linesearch','Quadratic'...
+    ,'MaxNonMinima',NDeflations, 'sigma',1,'theta',2,'MinAlpha',1e-8);
 [Iterations,options] = DMin(obj_fun,x0,Opt);
-%%
+%
 clf
 f = figure(1);
 subplot(2,1,1)
-options.ShowNonMinima = true;  options.ShowLegend = false;
+options.ShowNonMinima = false;  options.ShowLegend = false;
 PlotFE(xi,Iterations,obj_fun,evalfun,constants,options)
 xlabel('x')
 ylabel('u(x)')
-ylim([-3,5])
+% ylim([-3,5])
 subplot(2,1,2)
 options.ShowDeflations = 1:length(Iterations); options.ShowLegend = true;
 PlotFConvergence(Iterations,options,obj_fun)
@@ -789,15 +797,16 @@ A = constants.A;
 D2 = constants.D2;
 e0 = constants.e0;
 et = constants.et;
+epsilon = constants.epsilon;
 
 % Residual for the BVP: 0.05u'' + u^2 + 8x(1-x)u = 1, u(0) = 0, u(1) = 0:
-r =  [0.05*A*(D2*c) + (A*c).^2 + 8*(xi.*(1-xi))'.*(A*c) - 1; ...
+r =  [epsilon^2*A*(D2*c) + (A*c).^2 + 8*(xi.*(1-xi))'.*(A*c) - 1; ...
      e0*c;
      et*c];
 f =  dot(r,r)/2;
 
 if nargout>2
-    Jr =  [0.05*A*D2 + 2*spdiags(A*c,0,m,m)*A+ 8*(xi.*(1-xi))'.*A; ...
+    Jr =  [epsilon^2*A*D2 + 2*spdiags(A*c,0,m,m)*A+ 8*(xi.*(1-xi))'.*A; ...
         e0;
         et];
 end
@@ -833,7 +842,7 @@ if options.ShowLegend&&options.ShowNonMinima
 legend(lgnd,'location',loc)
 elseif options.ShowLegend
 str = convertCharsToStrings({Iterations(:).ConvergenceFlag});
-lgnd = strcat(hLegend(1).String, string(newline), format_errs([Iterations(str~="Max Iterations reached").ErrorAtDeflatedPoint]));
+lgnd = strcat(hLegend(1).String, string(newline), format_errs([Iterations(all([str~="Max Iterations reached";str~="Merit line search terminated with rank deficient Jacobian"],1)).ErrorAtDeflatedPoint]));
 legend(lgnd,'location',loc)
 end
 end
