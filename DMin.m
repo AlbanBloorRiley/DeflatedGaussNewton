@@ -305,7 +305,14 @@ j = 0;
 if res.RecordTimes
     tic
 end
+if isa(x0, 'function_handle')
+    makex0 = x0;
+end
+
 for  i=length(Iterations)+notfirstiteration:res.NDeflations
+    if exist('makex0','var')
+        x0 = makex0(i);
+    end
     if ~isempty([Iterations.DeflatedPoint])&&any(all(abs([Iterations.DeflatedPoint] - x0)<1e-16))
         warning('The intial vector is a deflated point, stopping method...')
         break
