@@ -403,6 +403,7 @@ grid on
 xlabel('k')
 ylabel('error')
 xlim([0,150])
+yticks([1e-10,1e-5,1,1e5])
 rearangelegend(GoodIterations,options)
 
 subplot(3,1,2)
@@ -413,6 +414,7 @@ grid on
 xlabel('k')
 ylabel('error')
 xlim([0,150])
+yticks([1e-10,1e-5,1,1e5])
 subplot(3,1,3)
 
 options.ShowDeflations = 1:length(NewtonIterations);
@@ -422,6 +424,7 @@ grid on
 xlabel('k')
 ylabel('error')
 xlim([0,150])
+yticks([1e-10,1e-5,1,1e5])
 
 linestyleorder('default')
 f.Units = 'centimeters';
@@ -505,26 +508,28 @@ constants.e0 = ones(1,2*n+1);
 constants.et = exp(1i*t*(-n:n)*2*pi/T);
 constants.et = (-1).^(-n:n);
 
-constants.epsilon =  (0.2)       %Carrier equation constant
-constants.epsilon =  sqrt(0.2)
+% constants.epsilon =  (0.2)       %Carrier equation constant
+% % constants.epsilon =  sqrt(0.2)
+% constants.epsilon =  sqrt(0.05)
 
 obj_fun=@(x,~)EvaluateCarrier(x,constants);
 evalfun = @(c,x) exp(1i*x*(-n:n)*2*pi/T)*c;
 
 x0 = zeros(2*n+1,1); 
 % x0 = ones(2*n+1,1).*1e-8; 
-% x0 = rand(2*n+1,1)*1e-8;
+ x0 =@(i) randn(2*n+1,1)*1e-8;
 Method = 'Good_GN';
-NDeflations = 10;
+NDeflations = 100;
 
-Opt = struct('NDeflations',NDeflations,'Method',Method,'epsilon',0.4,...
-    'MaxIter',400,'NormWeighting',constants.A,'ObjectiveTolerance',1e-18,...
+Opt = struct('NDeflations',NDeflations,'Method',Method,'epsilon',0.01,...
+    'MaxIter',400,'NormWeighting',constants.A,'ObjectiveTolerance',1e-13,...
     'StepTolerance',1e-4,'LinearSolver','lsqminnorm','Linesearch','Quadratic'...
     ,'MaxNonMinima',NDeflations, 'sigma',1,'theta',2,'MinAlpha',1e-8);
 [Iterations,options] = DMin(obj_fun,x0,Opt);
-%
-clf
+%%
+
 f = figure(1);
+clf
 subplot(2,1,1)
 options.ShowNonMinima = false;  options.ShowLegend = false;
 PlotFE(xi,Iterations,obj_fun,evalfun,constants,options)
@@ -559,7 +564,7 @@ else
 end
 f.Units = 'centimeters';
 f.Position = [-50 10 20 10];
-print(f, 'sec4Carrierfig.eps', '-depsc')
+% print(f, 'sec4Carrierfig.eps', '-depsc')
 
 
 %% Section 4.3.2 comparison figure part 1
@@ -692,7 +697,7 @@ B20 = -0.0570*meV/3; %(D = 3*B02)
 B40 = (-2.78*10^-6)*meV;
 B44 = (-3.2*10^-6)*meV;
 B22 = (6.8*10^-4)*meV;
-x0 = round([B20;B40;B44;B22; -9.1192e+05],2,'significant');
+x0 = round([B20;B40;B44;B22; -9.1192e+05],1,'significant');
 Sys.S = 10; 
 Sys.B2 = [B22 0 B20 0 0];        % B(k=2,q) with q = +2,+1,0,-1,-2
 Sys.B4 = [B44 0 0 0 B40 0 0 0 0];  % B(k=4,q) with q = +4,+3,+2,+1,0,-1,-2,-3,-4
@@ -705,22 +710,27 @@ A{1} = stev(10,[2,0]);
 A{2} = stev(10,[4,0]);
 A{3} = stev(10,[4,4]);
 A{4} = stev(10,[2,2]);
+% A{5} = speye(size(A{1}));
+% x0(end+1)=1;
+
+constants.A0=sparse(length(A{1}));
 constants.A = A;
 constants.ev = EE;
-
+%%
 Opt = struct('NDeflations',4,'Method','Good_GN','Linesearch','Quadratic',...
-'Verbose',false,'c1',1e-8,'constants',constants);
+'c1',1e-8,'constants',constants,'StepTolerance',1e-5);
+% obj_fun = @INSEvaulate;
 obj_fun = @INSEvaulateDifference;
-[SysOutGood]= DMin(obj_fun,x0(1:end-1),Opt);
-%
-Opt = struct('NDeflations',5,'Method','Bad_GN','Linesearch','Quadratic',...
+% [SysOutGood,options]= DMin(obj_fun,x0(1:end-1),Opt);
+
+Opt = struct('NDeflations',10,'Method','Bad_GN','Linesearch','Quadratic',...
     'Verbose',false,'c1',1e-9,'constants',constants);
 [SysOutBad]= DMin(obj_fun,x0(1:end-1),Opt);
 %
-Opt = struct('NDeflations',6,'Method','Newton','Linesearch','No',...
+Opt = struct('NDeflations',4,'Method','Newton','Linesearch','Armijo',...
     'Verbose',false,'scaled',false,'c1',1e-4,'constants',constants);
-[SysOutNewton]= DMin(obj_fun,x0(1:end-1),Opt);
-%%
+% [SysOutNewton]= DMin(obj_fun,x0(1:end-1),Opt);
+
 clf
 f=figure(1);
 subplot(3,1,1)
@@ -797,16 +807,16 @@ A = constants.A;
 D2 = constants.D2;
 e0 = constants.e0;
 et = constants.et;
-epsilon = constants.epsilon;
+% epsilon = constants.epsilon;
 
 % Residual for the BVP: 0.05u'' + u^2 + 8x(1-x)u = 1, u(0) = 0, u(1) = 0:
-r =  [epsilon^2*A*(D2*c) + (A*c).^2 + 8*(xi.*(1-xi))'.*(A*c) - 1; ...
+r =  [0.05*A*(D2*c) + (A*c).^2 + 8*(xi.*(1-xi))'.*(A*c) - 1; ...
      e0*c;
      et*c];
 f =  dot(r,r)/2;
 
 if nargout>2
-    Jr =  [epsilon^2*A*D2 + 2*spdiags(A*c,0,m,m)*A+ 8*(xi.*(1-xi))'.*A; ...
+    Jr =  [0.05*A*D2 + 2*spdiags(A*c,0,m,m)*A+ 8*(xi.*(1-xi))'.*A; ...
         e0;
         et];
 end
