@@ -8,6 +8,7 @@ if ~isfield(options,"fontsize")
 end
 % clf
 lgnd = ["Undeflated "];
+lgnd = string;
 hold on
 
 for i = options.ShowDeflations
@@ -18,19 +19,26 @@ for i = options.ShowDeflations
     end
     if ~contains(problem(i).ConvergenceFlag,["Max Iterations reached","Merit line search terminated with rank deficient Jacobian"])
         semilogy(x,y,'linewidth',1)
+            entry = ['Deflation ', num2str(i-1)];
+    lgnd = [lgnd; entry];
     elseif options.ShowNonMinima
         colorOrder = get(gca, 'ColorOrder');
         semilogy(x,y,'linewidth',1,'Color', [colorOrder(mod((get(gca,'ColorOrderIndex'))-1, size(colorOrder, 1))+1, :), 0.2])   
-    else
-        continue
-    end
-    entry = ['Deflation ', num2str(i)];
+        entry = ['Deflation ', num2str(i-1)];
     lgnd = [lgnd; entry];
+        % else
+    %     continue
+    end
+
 end
 hold off
 set(gca, 'YScale', 'log')
 set(gca,'YMinorGrid','off')
 if options.ShowLegend
-    lgnd = lgnd(1:end-1,:);
+    lgnd = lgnd(2:end,:);
+    if lgnd(1)=="Deflation 0"
+        lgnd(1) = ["Undeflated "];
+        % lgnd = lgnd(2:end,:);
+    end
     legend(lgnd,'fontsize',options.fontsize)
 end

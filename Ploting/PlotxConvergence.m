@@ -18,27 +18,35 @@ for i = options.ShowDeflations
     end
 end
 hold on
-lgnd = ["Undeflated "];
+% lgnd = ["Undeflated "];
+lgnd = string;
 for i = options.ShowDeflations
     x = 1:length(problem(i).Iterates);
     xx = nan(length(problem(i).Iterates),1);
     for j = 1:size(problem(i).Iterates,2)
         xx(j) = norm(problem(i).Iterates(:,j)-problem(i).Iterates(:,end));
 
+
     end
     if ~contains(problem(i).ConvergenceFlag,["Max Iterations reached","Merit line search terminated with rank deficient Jacobian"])
         semilogy(x,xx,'linewidth',1)
+        entry = ['Deflation ', num2str(i-1)];
+        lgnd = [lgnd; entry];
     else
+        if ~isfield(options,'ShowNonMinima')|| options.ShowNonMinima
         colorOrder = get(gca, 'ColorOrder');
         semilogy(x,xx,'linewidth',1,'Color', [colorOrder(mod((get(gca,'ColorOrderIndex'))-1, size(colorOrder, 1))+1, :), 0.2])
+        entry = ['Deflation ', num2str(i-1)];
+        lgnd = [lgnd; entry];  
+        end
     end
-    if options.ShowLegend
-        entry = ['Deflation ', num2str(i)];
-        lgnd = [lgnd; entry];
-    end
+
 end
 if options.ShowLegend
-    lgnd = lgnd(1:end-1,:);
+    lgnd = lgnd(2:end,:);
+    if lgnd(1) == "Deflation 0"
+        lgnd(1) = "Undeflated";
+    end
     legend(lgnd)
 end
 set(gca, 'YScale', 'log')
