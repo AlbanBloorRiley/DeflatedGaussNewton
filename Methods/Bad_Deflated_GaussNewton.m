@@ -45,9 +45,9 @@ while stop == false
         FuncCount = FuncCount+FCount;
         if (alpha<=params.linesearch.merit.minalpha)
             if rank(X.J)<length(x)
-                CurrentLoop.ConvergenceFlag = "Merit line search terminated with rank deficient Jacobian";
+                CurrentLoop.ConvergenceFlag = 'Merit line search terminated with rank deficient Jacobian';
             else
-                CurrentLoop.ConvergenceFlag = "Merit line search terminated";
+                CurrentLoop.ConvergenceFlag = 'Merit line search terminated';
             end
             break
         end
