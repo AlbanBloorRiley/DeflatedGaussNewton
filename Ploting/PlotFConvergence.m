@@ -12,7 +12,7 @@ lgnd = string;
 hold on
 
 for i = options.ShowDeflations
-    x = 1:length(problem(i).Iterates);
+    x = 0:length(problem(i).Iterates)-1;
     y = nan(length(problem(i).Iterates),1);
     for j = 1:size(problem(i).Iterates,2)
         y(j) = obj_fun(problem(i).Iterates(:,j),options.constants);

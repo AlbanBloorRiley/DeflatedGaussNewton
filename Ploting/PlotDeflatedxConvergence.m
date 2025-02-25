@@ -53,8 +53,13 @@ for i = options.ShowDeflations
     xx(~plotNotDeflated) = NaN;
     colours = colororder;
     if ~contains(problem(i).ConvergenceFlag,["Max Iterations reached","Merit line search terminated with rank deficient Jacobian"])
-        semilogy(X,xx,'linewidth',2,'color',colours(mod(i-1,7)+1,:))
-        semilogy(X,xxDeflated,'--','linewidth',2,'color',colours(mod(i-1,7)+1,:),'HandleVisibility','off')
+        semilogy(X,xx,'linewidth',1.2,'color',colours(mod(i-1,7)+1,:))
+        if isfield(options,'Dashed')&&options.Dashed
+            semilogy(X,xxDeflated,'--','linewidth',1.4,'color',colours(mod(i-1,7)+1,:),'HandleVisibility','off')
+
+        else
+            semilogy(X,xxDeflated,'linewidth',2.4,'color',colours(mod(i-1,7)+1,:),'HandleVisibility','off')
+        end
     else
         colorOrder = get(gca, 'ColorOrder');
         semilogy(X,xx,'linewidth',1,'Color', [colorOrder(mod((get(gca,'ColorOrderIndex'))-1, size(colorOrder, 1))+1, :), 0.2])
@@ -69,7 +74,7 @@ if options.ShowLegend
     if lgnd(1) == "Deflation 0"
         lgnd(1) = "Undeflated";
     end
-    lgnd = lgnd(1:end-1,:);
+    % lgnd = lgnd(1:end-1,:);
     legend(lgnd)
 end
 set(gca, 'YScale', 'log')
